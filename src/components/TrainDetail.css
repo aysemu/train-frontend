@@ -1,0 +1,32 @@
+.dashboard-container {
+  padding: 20px;
+  color: white;
+  display: grid;
+  gap: 30px;   /* 👈 tüm kartlar arası boşluk */
+  gap: 30px;   /* 👈 tüm kartlar arası boşluk */
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+.top-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+/* Kart tasarımı */
+.card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Konum tam genişlik */
+.location-card {
+  width: 97%;
+}
