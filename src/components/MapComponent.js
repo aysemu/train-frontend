@@ -38,7 +38,6 @@ function MapComponent({ latitude, longitude, trainId }) {
   }, []);
 
   if (latitude == null || longitude == null) return null;
-
   const stationMarkerOptions = {
     radius: 5,
     fillColor: "#ffffff",
