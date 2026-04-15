@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import socket from "./services/socket";
 import TrainList from "./components/TrainList";
-import MapComponent from "./components/MapComponent"; // Haritayı ekledik
-import TrainPopup from "./components/TrainPopup";    // BU SATIR HATAYI ÇÖZER
+import MapComponent from "./components/MapComponent"; 
+import TrainPopup from "./components/TrainPopup";    
 import "./App.css";
 
 function App() {
   const [trains, setTrains] = useState({});
   const [selectedTrain, setSelectedTrain] = useState(null);
+  const [selectedHistoryPos, setSelectedHistoryPos] = useState(null); // Geçmiş konum state'i
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -28,7 +29,7 @@ function App() {
 
     socket.on("telemetry", (data) => {
       setTrains((prev) => ({
-        ...prev,
+        ...prev,s
         [data.trainId]: data
       }));
     });
@@ -37,26 +38,40 @@ function App() {
   }, []);
 
   return (
-    <div className="app-container" style={{ display: "flex", height: "100vh" }}>
+    <div className="app-container" >
+      {/* SOL PANEL: Tren Listesi */}
       <TrainList
         trains={trains}
         selectedTrain={selectedTrain}
-        onSelect={(id) => setSelectedTrain(id)}
+        onSelect={(id) => {
+          setSelectedTrain(id);
+          setSelectedHistoryPos(null); // Listeden yeni tren seçilince hayaleti temizle
+        }}
       />
       
+      {/* SAĞ PANEL: Harita ve Popup Kapsayıcısı */}
       <div style={{ flex: 1, position: "relative" }}>
-        {/* HARİTA ARKA PLANDA */}
-        <div className="map-wrapper" style={{ flex: 1, height: "100vh", position: "relative" }}>
-        <MapComponent 
-          trains={Object.values(trains)} 
-          onMarkerClick={(id) => setSelectedTrain(id)} 
-        /></div>
+        <div className="map-wrapper" style={{ width: "100%", height: "100%" }}>
+          <MapComponent 
+            trains={Object.values(trains)} 
+            selectedTrain={trains[selectedTrain]} 
+            historyPos={selectedHistoryPos} 
+            onMarkerClick={(id) => {
+              setSelectedTrain(id);
+              setSelectedHistoryPos(null); 
+            }} 
+          />
+        </div>
 
-        {/* POPUP ÜST KATMANDA */}
+        {/* POPUP KATMANI: Sadece bir tren seçiliyse görünür */}
         {selectedTrain && trains[selectedTrain] && (
           <TrainPopup 
             train={trains[selectedTrain]} 
-            onClose={() => setSelectedTrain(null)} // setSelectedTrain olarak düzelttik
+            onClose={() => {
+              setSelectedTrain(null);
+              setSelectedHistoryPos(null);
+            }} 
+            onHistoryClick={(pos) => setSelectedHistoryPos(pos)} 
           />
         )}
       </div>

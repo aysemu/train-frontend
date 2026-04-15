@@ -16,7 +16,10 @@
   box-shadow: 0 12px 40px rgba(0,0,0,0.4);
   border: 1px solid #333;
   color: white;
+  transform: scale(0.85); /* Popup'ı %15 küçültür */
+  transform-origin: top right; /* Sağ üst köşeden küçülsün */
 }
+
 
 .popup-title {
   margin-top: 0;

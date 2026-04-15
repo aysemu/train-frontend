@@ -1,0 +1,51 @@
+/* Custom Train Icon Stilleri */
+
+/* Ana kapsayıcı (L.divIcon için) */
+.custom-train-icon {
+  background: none !important;
+  border: none !important;
+}
+
+/* İkon ve numara sarmalayıcı div */
+.icon-wrapper {
+  position: relative;
+  width: 25px;
+  height: 41px;
+}
+
+/* Standart marker görseli */
+.marker-img {
+  width: 100%;
+  height: 100%;
+  position:absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Tren numarası etiketi */
+.train-number {
+  position: absolute;
+  top: -20px; /* Marker'ın hemen üzerine yaz */
+  left: 50%;
+  transform: translateX(-50%); /* Ortala */
+  background: rgba(15, 23, 42, 0.9); /* Koyu arka plan */
+  color: #fff; /* Beyaz yazı */
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  white-space: nowrap; /* Yazıyı tek satırda tut */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  pointer-events: none; /* Mouse tıklamasını engelle */
+}
+
+/* Seçili tren için özel stil (Neon efekt) */
+.icon-wrapper.selected .marker-img {
+  filter: drop-shadow(0 0 8px #00e5ff); /* Neon mavi gölge */
+}
+
+.icon-wrapper.selected .train-number {
+  background: rgba(0, 229, 255, 0.95); /* Neon mavi arka plan */
+  color: #000; /* Siyah yazı */
+  border: 1px solid #fff;
+}
