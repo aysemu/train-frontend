@@ -7,8 +7,8 @@
 
 .thermometer {
   position: relative;
-  width: 40px;
-  height: 200px;
+  width: 30px;
+  height: 120px;
   background: #1e293b;
   border-radius: 20px;
   overflow: hidden;
@@ -26,5 +26,5 @@
 .temp-value {
   margin-top: 10px;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
 }

@@ -43,5 +43,18 @@ body {
   font-family: Arial, sans-serif;
 }
 
+/* App.css veya index.css içine ekle */
 
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1; /* Popup'ın (9999) altında kalması için */
+}
+
+.app-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 

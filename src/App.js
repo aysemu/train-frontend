@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import socket from "./services/socket";
 import TrainList from "./components/TrainList";
-import TrainDetail from "./components/TrainDetail";
+import MapComponent from "./components/MapComponent"; // Haritayı ekledik
+import TrainPopup from "./components/TrainPopup";    // BU SATIR HATAYI ÇÖZER
 import "./App.css";
 
 function App() {
@@ -9,13 +10,10 @@ function App() {
   const [selectedTrain, setSelectedTrain] = useState(null);
 
   useEffect(() => {
-    // 1. ADIM: Sayfa açıldığında veritabanındaki son kayıtları getir (REST API)
     const fetchInitialData = async () => {
       try {
         const response = await fetch("http://localhost:4000/api/trains");
         const data = await response.json();
-        
-        // Gelen diziyi { "id1": data, "id2": data } formatına çevirip state'e atıyoruz
         const trainMap = {};
         data.forEach(train => {
           trainMap[train.trainId] = train;
@@ -28,7 +26,6 @@ function App() {
 
     fetchInitialData();
 
-    // 2. ADIM: Canlı güncellemeleri dinle (Socket.io)
     socket.on("telemetry", (data) => {
       setTrains((prev) => ({
         ...prev,
@@ -44,17 +41,24 @@ function App() {
       <TrainList
         trains={trains}
         selectedTrain={selectedTrain}
-        onSelect={(id) => {
-    console.log("Seçilen Tren ID:", id); // Bunu ekle ve tıkla!
-    setSelectedTrain(id);}}
+        onSelect={(id) => setSelectedTrain(id)}
       />
-      <div style={{ flex: 1 }}>
-        {/* Seçili tren varsa detayı göster */}
-        {selectedTrain ? (
-          <TrainDetail train={trains[selectedTrain]} />
-        ) : (
-          <div className="placeholder">Lütfen listeden bir tren seçin.</div>
-        )} 
+      
+      <div style={{ flex: 1, position: "relative" }}>
+        {/* HARİTA ARKA PLANDA */}
+        <div className="map-wrapper" style={{ flex: 1, height: "100vh", position: "relative" }}>
+        <MapComponent 
+          trains={Object.values(trains)} 
+          onMarkerClick={(id) => setSelectedTrain(id)} 
+        /></div>
+
+        {/* POPUP ÜST KATMANDA */}
+        {selectedTrain && trains[selectedTrain] && (
+          <TrainPopup 
+            train={trains[selectedTrain]} 
+            onClose={() => setSelectedTrain(null)} // setSelectedTrain olarak düzelttik
+          />
+        )}
       </div>
     </div>
   );

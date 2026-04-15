@@ -1,96 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// 1. ADIM: RecenterMap artık en dışta ve bağımsız bir bileşen
-function RecenterMap({ latitude, longitude }) {
-  const map = useMap();
-  useEffect(() => {
-    if (latitude && longitude) {
-      map.setView([latitude, longitude], map.getZoom(), { animate: true, duration: 0.5 });
-    }
-  }, [latitude, longitude, map]);
-  return null;
-}
-
-function MapComponent({ latitude, longitude, trainId }) {
-  const [railData, setRailData] = useState(null);
-  const [stationData, setStationData] = useState(null);
-
-  const marker = new L.Icon({
-    iconUrl: require("leaflet/dist/images/marker-icon.png"),
-    shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+// Marker ikon hatasını çözmek için standart Leaflet ikonlarını manuel tanımlıyoruz
+const trainIcon = new L.Icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41],
     popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-  });
+});
 
-  useEffect(() => {
-    fetch("/railway_lines.json")
-      .then((res) => res.json())
-      .then((data) => setRailData(data));
+function MapComponent({ trains, onMarkerClick }) {
+    const [railData, setRailData] = useState(null);
+    const [stationData, setStationData] = useState(null);
 
-    fetch("/stations.json")
-      .then((res) => res.json())
-      .then((data) => setStationData(data));
-  }, []);
+    useEffect(() => {
+        fetch("/railway_lines.json").then(res => res.json()).then(data => setRailData(data));
+        fetch("/stations.json").then(res => res.json()).then(data => setStationData(data));
+    }, []);
 
-  if (latitude == null || longitude == null) return null;
-  const stationMarkerOptions = {
-    radius: 5,
-    fillColor: "#ffffff",
-    color: "#1e293b",
-    weight: 2,
-    opacity: 1,
-    fillOpacity: 1,
-  };
+    // İstasyon noktaları için stil (Daha önce sendeki ayarlar)
+    const stationMarkerOptions = {
+        radius: 5,
+        fillColor: "#ffffff",
+        color: "#1e293b",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 1,
+    };
 
-  return (
-    <MapContainer
-      center={[latitude, longitude]}
-      zoom={13}
-      style={{ height: "800px", width: "100%", borderRadius: "12px" }}
-    >
-      <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    return (
+        <MapContainer
+            center={[39.9334, 32.8597]} 
+            zoom={7}
+            style={{ height: "100%", width: "100%" }}
+        >
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-      {/* 2. ADIM: TileLayer'dan sonra burada çağırıyoruz */}
-      <RecenterMap latitude={latitude} longitude={longitude} />
+            {/* 1. TRENLER: Yüzlerce görsel hatasını engellemek için ikonu sabitledik */}
+            {trains && trains.map((train) => (
+                <Marker 
+                    key={train.trainId} 
+                    position={[train.latitude, train.longitude]} 
+                    icon={trainIcon}
+                    eventHandlers={{
+                        click: () => onMarkerClick(train.trainId),
+                    }}
+                >
+                    <Popup>{train.trainId}</Popup>
+                </Marker>
+            ))}
 
-      {railData && (
-        <GeoJSON 
-          key={`rails-${railData.features.length}`}
-          data={railData} 
-          style={{ color: "#2f7fee", weight: 2 }} 
-        />
-      )}
+            {/* 2. DEMİRYOLLARI */}
+            {railData && <GeoJSON data={railData} style={{ color: "#2f7fee", weight: 2 }} />}
 
-      {stationData && (
-        <GeoJSON
-          key={`stations-${stationData.features.length}`}
-          data={stationData}
-          pointToLayer={(feature, latlng) => L.circleMarker(latlng, stationMarkerOptions)}
-          onEachFeature={(feature, layer) => {
-            if (feature.properties && feature.properties.name) {
-              layer.bindPopup(`<div style="color: black;"><strong>İstasyon:</strong> ${feature.properties.name}</div>`);
-            }
-          }}
-        />
-      )}
-
-      <Marker position={[latitude, longitude]} icon={marker}>
-        <Popup>
-          <div style={{ color: "black", fontSize: "14px" }}>
-            <strong style={{ color: "#d22121" }}>{trainId || "Bilinmeyen Tren"}</strong>
-          </div>
-        </Popup>
-      </Marker>
-    </MapContainer>
-  );
+            {/* 3. İSTASYONLAR: Geri geldiler! */}
+            {stationData && (
+                <GeoJSON
+                    data={stationData}
+                    pointToLayer={(feature, latlng) => L.circleMarker(latlng, stationMarkerOptions)}
+                    onEachFeature={(feature, layer) => {
+                        if (feature.properties?.name) {
+                            layer.bindPopup(`<div style="color: black;"><strong>İstasyon:</strong> ${feature.properties.name}</div>`);
+                        }
+                    }}
+                />
+            )}
+        </MapContainer>
+    );
 }
 
 export default MapComponent;

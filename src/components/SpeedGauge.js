@@ -3,7 +3,7 @@ import GaugeComponent from "react-gauge-component";
 
 function SpeedGauge({ speed }) {
   return (
-    <div style={{ width: 300, height: 200 }}>
+    <div style={{ width: 200, height: 200 }}>
       <GaugeComponent
         value={speed}
         minValue={0}

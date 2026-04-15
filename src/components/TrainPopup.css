@@ -1,0 +1,76 @@
+/* TrainPopup.css */
+
+.modal-overlay {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 420px; /* Göstergeler sığsın diye biraz genişlettik */
+}
+
+.modal-content {
+  background: rgba(18, 18, 18, 0.95); /* Koyu modern tema */
+  backdrop-filter: blur(15px);
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  border: 1px solid #333;
+  color: white;
+}
+
+.popup-title {
+  margin-top: 0;
+  border-bottom: 1px solid #444;
+  padding-bottom: 10px;
+  color: #00e5ff; /* Neon mavi başlık */
+}
+
+.visuals-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin: 20px 0;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.visual-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Gauge çok büyükse burada küçültebiliriz */
+  transform: scale(0.9); 
+}
+
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.mini-table th {
+  text-align: left;
+  color: #888;
+  border-bottom: 1px solid #333;
+  padding: 5px;
+}
+
+.mini-table td {
+  padding: 5px;
+  border-bottom: 1px solid #222;
+  font-size: 17px;
+}
+
+.close-btn {
+  float: right;
+  border: none;
+  background: none;
+  font-size: 28px;
+  color: #ff5252;
+  cursor: pointer;
+  line-height: 1;
+}
