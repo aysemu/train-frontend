@@ -29,7 +29,7 @@ function App() {
 
     socket.on("telemetry", (data) => {
       setTrains((prev) => ({
-        ...prev,s
+        ...prev,
         [data.trainId]: data
       }));
     });
