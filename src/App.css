@@ -12,6 +12,11 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+.modal-overlay {
+  position: absolute; /* fixed yerine absolute kullanarak harita kapsayıcısına sabitle */
+  pointer-events: auto; /* Tıklamaları popup üzerinde tut */
+  /* ... */
+}
 
 .App-header {
   background-color: #282c34;

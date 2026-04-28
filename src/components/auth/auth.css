@@ -1,0 +1,187 @@
+/* auth.css */
+/* auth.css eklemeleri */
+.role-selector {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.role-btn {
+    flex: 1;
+    padding: 8px 5px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.role-btn.active {
+    background: rgba(66, 165, 245, 0.2);
+    color: #42a5f5;
+    box-shadow: 0 0 15px rgba(66, 165, 245, 0.3);
+    border: 1px solid rgba(66, 165, 245, 0.5);
+}
+.auth-scene {
+    min-height: 100vh;
+    display: flex;
+    background: #060f1e; /* Ana arka plan */
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+}
+
+/* Sol Taraf: Görsel Alanı */
+.auth-visual-side {
+    flex: 1.2; /* Resim alanı biraz daha geniş olsun */
+    position: relative;
+    background-image: url('tren.jpg'); /* Tren görseli */
+    background-size: cover;
+    display: flex;
+    align-items: flex-end;
+    padding: 60px;
+}
+
+/* Resmin üzerine hafif bir karartma (metin okunabilsin diye) */
+.auth-visual-side::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(6, 15, 30, 0.8) 100%);
+}
+
+.visual-content {
+    position: relative;
+    z-index: 2;
+    color: white;
+}
+
+.visual-content h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #42a5f5, #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sağ Taraf: Form Alanı */
+.auth-form-side {
+    flex: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #060f1e 0%, #0b2040 100%);
+    padding: 40px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+/* Diğer bileşen stilleri (tab-btn, btn-primary vb.) aynı kalabilir */
+.auth-tab-bar {
+    display: flex; background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px; padding: 4px; margin-bottom: 26px; gap: 4px;
+}
+
+.tab-btn {
+    flex: 1; padding: 9px 0; border-radius: 9px; border: none;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    background: transparent; color: rgba(190, 215, 255, 0.5);
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, #1976d2, #2196f3);
+    color: #fff; box-shadow: 0 2px 12px rgba(33, 150, 243, 0.35);
+}
+
+.btn-primary {
+    width: 100%; background: linear-gradient(90deg, #1565c0, #42a5f5);
+    border: none; border-radius: 10px; padding: 13px;
+    color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+    margin-top: 10px; box-shadow: 0 4px 18px rgba(33, 150, 243, 0.4);
+}
+/* Şifremi Unuttum Metni */
+.forgot-password-text {
+    color: rgba(66, 165, 245, 0.8);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none; /* Metnin kazara seçilmesini engeller */
+}
+
+.forgot-password-text:hover {
+    color: #42a5f5;
+    text-decoration: underline;
+}
+
+/* Kayıt Ol Metni */
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.switch-auth-text {
+    color: #42a5f5;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 5px;
+    transition: all 0.2s ease;
+}
+
+.switch-auth-text:hover {
+    color: #64b5f6;
+    text-decoration: underline;
+}
+
+/* form-options div'ini de hizalayalım */
+.form-options {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+.field-label {
+    display: block;
+    text-align:  center;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+}  
+.form-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #fff;
+    text-align: center;
+} 
+.auth-input-select {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    color: #42a5f5; /* Tren ID'leri mavi ve belirgin olsun */
+    font-weight: 600;
+    outline: none;
+    appearance: none; /* Standart ok işaretini kaldırıp özelleştirebilirsin */
+    cursor: pointer;
+}

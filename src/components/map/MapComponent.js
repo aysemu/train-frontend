@@ -23,27 +23,41 @@ function RecenterMap({ selectedTrain, historyPos, markerRefs }) {
     const map = useMap();
     
     useEffect(() => {
-        // Eğer bir geçmiş konumuna tıklandıysa oraya odaklan
+        if (!map || !selectedTrain) return;
+        // EĞER SEÇİLİ TREN VEYA GEÇMİŞ YOKSA HİÇBİR ŞEY YAPMA
+        if (!selectedTrain && !historyPos) return;
+
+        // Harita hazır değilse çık
+        if (!map || typeof map.getZoom !== 'function') return;
+
+        const { latitude, longitude, trainId } = selectedTrain;
+
+        // 1. Eğer geçmiş konum seçiliyse oraya odaklan ve DUR
         if (historyPos) {
-            // Geçmiş konuma giderken odaklanmak için 15 ideal, 
-            // ama istersen burayı da map.getZoom() yapabilirsin.
             map.setView([historyPos.latitude, historyPos.longitude], 15, { animate: true });
-        } 
-        // Yoksa normal seçili treni takip et
-        else if (selectedTrain?.trainId && markerRefs.current[selectedTrain.trainId]) {
-            const { latitude, longitude } = selectedTrain;
-            
-            // KRİTİK DEĞİŞİKLİK: Sabit zoom yerine o anki zoom'u alıyoruz
-            const currentZoom = map.getZoom(); 
-            
-            map.setView([latitude, longitude], currentZoom, { 
+            return; 
+        }
+
+        // 2. Sadece seçili trenin koordinatları gerçekten değiştiyse hareket et
+        // Leaflet'in mevcut merkezini alıp mesafe kontrolü yapıyoruz
+        const center = map.getCenter();
+        const latDiff = Math.abs(center.lat - latitude);
+        const lonDiff = Math.abs(center.lng - longitude);
+
+        // Çok küçük değişimlerde (titreme seviyesinde) haritayı oynatma
+        if (latDiff > 0.0001 || lonDiff > 0.0001) {
+            map.setView([latitude, longitude], map.getZoom(), { 
                 animate: true,
-                duration: 0.5 // Geçiş süresini biraz kısalttık ki canlı takip daha akıcı olsun
+                duration: 0.5 
             });
             
-            markerRefs.current[selectedTrain.trainId].openPopup();
+            // Popup'ı sadece marker varsa aç
+            if (markerRefs.current[trainId]) {
+                markerRefs.current[trainId].openPopup();
+            }
         }
-    }, [selectedTrain, historyPos, map, markerRefs]);
+    }, [selectedTrain?.latitude, selectedTrain?.longitude, historyPos]); 
+    // ^ Sadece koordinatlar veya geçmiş seçim değişirse çalışacak
 
     return null;
 }
@@ -59,7 +73,13 @@ function MapComponent({ trains, selectedTrain, historyPos, onMarkerClick }) {
     }, []);
 
     return (
-        <MapContainer center={[39.9334, 32.8597]} zoom={7} style={{ height: "100%", width: "100%" }}>
+        <MapContainer
+            center={[39.9334, 32.8597]} 
+            zoom={7} 
+            style={{ height: "100%", width: "100%" }}
+            preferCanvas={true} // <--- Performans için çok kritik
+            zoomControl={false} // <--- Eğer kendi zoom butonların varsa çakışmasın
+            >
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
             <RecenterMap selectedTrain={selectedTrain} historyPos={historyPos} markerRefs={markerRefs} />

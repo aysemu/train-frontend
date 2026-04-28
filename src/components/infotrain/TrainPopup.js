@@ -3,17 +3,38 @@ import SpeedGauge from "./SpeedGauge";
 import MotorTemperature from "./MotorTemperature";
 import "./TrainPopup.css";
 
-function TrainPopup({ train, onClose, onHistoryClick }) { // onHistoryClick prop'u ekledim ki geçmişi görelim
+function TrainPopup({ train, onClose, onHistoryClick }) {
   const [history, setHistory] = useState([]);
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (train?.trainId) {
-      fetch(`http://localhost:4000/api/trains/${train.trainId}/history`)
-        .then(res => res.json())
-        .then(data => setHistory(data.slice(0, 5))) // Son 5 sinyali aldım
-        .catch(err => console.error(err));
-    }
-  }, [train?.trainId]);
+    // 1. Fonksiyonu useEffect içinde tanımlayıp hemen çağırıyoruz
+    const fetchHistory = async () => {
+      if (!train?.trainId) return;
+
+      try {
+        const res = await fetch(`http://localhost:4000/api/trains/${train.trainId}/history`, {
+          headers: {
+            "Authorization": `Bearer ${token}` // Token artık burada!
+          }
+        });
+
+        const data = await res.json();
+
+        // 2. Güvenlik Kontrolü: Gelen veri dizi mi? (Slice hatasını engeller)
+        if (Array.isArray(data)) {
+          setHistory(data.slice(0, 5)); // Son 5 sinyali al
+        } else {
+          console.error("Beklenen geçmiş verisi dizi değil:", data);
+          setHistory([]);
+        }
+      } catch (err) {
+        console.error("Geçmiş verisi çekilirken hata oluştu:", err);
+      }
+    };
+
+    fetchHistory();
+  }, [train?.trainId, token]); // trainId veya token değişirse tekrar çek
 
   return (
     <div className="modal-overlay">
