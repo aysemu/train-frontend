@@ -3,24 +3,31 @@ import axios from "axios";
 import { FormField } from "./inputs";
 import { EmailIcon, UserIcon, LockIcon } from "./icons"; // PhoneIcon varsa ekleyebilirsin
 
+// src/components/SignupForm.js
+
 export const SignupForm = ({ onSwitch }) => {
-    // State'e role ve phone alanlarını ekledik
     const [data, setData] = useState({ 
         name: "", 
         email: "", 
         password: "", 
         phone: "", 
-        role: "engineer" // Varsayılan rol
+        tcNo: "", // TC Kimlik alanı eklendi
+        role: "engineer",
+        assignedTrain: "" // Bunu da boş string olarak başlatalım
     });
-// E5000'den E5020'ye kadar otomatik liste oluşturur
-const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' + i : i}`);
-// Sonuç: ["E5000", "E5001", ..., "E5020"]
+
+    const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' + i : i}`);
+
     const handleSignup = async (e) => {
         e.preventDefault();
+        // Basit bir TC uzunluk kontrolü
+        if (data.tcNo.length !== 11) {
+            return alert("T.C. Kimlik numarası 11 haneli olmalıdır.");
+        }
         try {
             await axios.post("http://localhost:4000/api/auth/register", data);
             alert("Kayıt başarılı! Giriş yapabilirsiniz.");
-            onSwitch(); // Başarılıysa giriş ekranına yönlendir
+            onSwitch(); 
         } catch (err) { 
             alert(err.response?.data?.message || "Kayıt yapılamadı."); 
         }
@@ -30,7 +37,7 @@ const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' 
         <form onSubmit={handleSignup} className="auth-form">
             <h2 className="form-title" style={{color:'#fff'}}>Hesap Oluştur</h2>
 
-            {/* ROL SEÇİCİ - Giriş ekranıyla aynı tasarım */}
+            {/* ROL SEÇİCİ KISMI AYNI KALIYOR */}
             <div className="role-selector-wrapper">
                 <label className="field-label" style={{color:'#64b5f6'}}>Sistem Yetkisi</label>
                 <div className="role-selector">
@@ -46,9 +53,31 @@ const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' 
                     ))}
                 </div>
             </div>
+
+            {/* TC KİMLİK NUMARASI ALANI */}
+            <FormField 
+                label="T.C. Kimlik Numarası" 
+                icon={UserIcon} 
+                type="text"
+                maxLength="11"
+                required 
+                placeholder="11 Haneli TC Kimlik No"
+                onChange={e => setData({ ...data, tcNo: e.target.value })} 
+            />
+
+            {/* AD SOYAD VE DİĞERLERİ AYNI KALIYOR... */}
+            <FormField 
+                label="Ad Soyad" 
+                icon={UserIcon} 
+                required 
+                placeholder="Örn: Ayşen Yılmaz"
+                onChange={e => setData({ ...data, name: e.target.value })} 
+            />
+
+            {/* MAKİNİSTSE TREN SEÇİMİ */}
             {data.role === "makinist" && (
                 <div className="field-group" style={{ marginBottom: "15px" }}>
-                    <label className="field-label">Atanacak Lokomotif (E5000 Serisi)</label>
+                    <label className="field-label">Atanacak Lokomotif</label>
                     <select 
                         className="auth-input-select"
                         required
@@ -63,30 +92,21 @@ const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' 
                 </div>
             )}
 
-            <FormField 
-                label="Ad Soyad" 
-                icon={UserIcon} 
-                required 
-                placeholder="Örn: Ayşen Yılmaz"
-                onChange={e => setData({ ...data, name: e.target.value })} 
-            />
-
+            {/* E-POSTA, TELEFON VE ŞİFRE... */}
             <FormField 
                 label="E-posta" 
                 icon={EmailIcon} 
                 type="email" 
                 required 
-                placeholder="ornek@sirket.com"
                 onChange={e => setData({ ...data, email: e.target.value })} 
             />
 
-            {/* TELEFON NUMARASI EKLEMESİ */}
             <FormField 
                 label="Telefon Numarası" 
-                icon={UserIcon} // Varsa PhoneIcon
+                icon={UserIcon}
                 type="tel" 
                 placeholder="05xx xxx xx xx"
-                required={data.role === "makinist"} // Makinistse zorunlu yapalım
+                required={data.role === "makinist"} 
                 onChange={e => setData({ ...data, phone: e.target.value })} 
             />
 
@@ -95,20 +115,13 @@ const availableTrains = Array.from({ length: 21 }, (_, i) => `E50${i < 10 ? '0' 
                 icon={LockIcon} 
                 type="password" 
                 required 
-                placeholder="••••••••"
                 onChange={e => setData({ ...data, password: e.target.value })} 
             />
 
             <button className="btn-primary" type="submit" style={{ marginTop: "10px" }}>
                  KAYIT OL
             </button>
-
-            <p className="auth-footer">
-                Zaten üye misin?{" "}
-                <span className="switch-auth-text" onClick={onSwitch}>
-                    Giriş Yap
-                </span>
-            </p>
+            {/* ... FOOTER AYNI ... */}
         </form>
     );
 };

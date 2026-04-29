@@ -9,6 +9,7 @@ const Profile = () => {
     email: "",
     trainId: "",
     createdAt: "",
+    startDate: "",
     phone: "",
     tcNo: "",
     address: "",
@@ -18,34 +19,72 @@ const Profile = () => {
   });
 
   useEffect(() => {
-    // Mevcut kullanıcıyı çek (Bunu backend'de bir /api/auth/me rotasıyla yaparsan daha güvenli olur)
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(prev => ({ ...prev, ...savedUser }));
-  }, []);
+    const fetchUserProfile = async () => {
+        try {
+            const savedUser = JSON.parse(localStorage.getItem("user"));
+            const token = localStorage.getItem("token");
+
+            // Backend'de tüm kullanıcıları getiren veya ID ile getiren bir rotan varsa:
+            const response = await axios.get(`http://localhost:4000/api/auth/users/${savedUser.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            setUser(response.data); // Veritabanından gelen tam veriyi set et
+        } catch (err) {
+            // Eğer üstteki rota yoksa, şimdilik sadece localStorage'dan oku
+            const savedUser = JSON.parse(localStorage.getItem("user"));
+            setUser(prev => ({ ...prev, ...savedUser }));
+        }
+    };
+
+    fetchUserProfile();
+}, []);
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:4000/api/auth/update-profile`, user, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      alert("Bilgileriniz güncellendi!");
-      localStorage.setItem("user", JSON.stringify(user));
-    } catch (err) {
-      alert("Güncelleme hatası.");
-    }
-  };
+  e.preventDefault();
+  try {
+    const token = localStorage.getItem("token");
+
+    const updateData = {
+      ...user,
+      id: user.id || user._id // Hangisi doluysa onu gönder
+    };
+
+    // İstek atmadan önce konsola  bakamak için
+    console.log("Güncellenecek veri:", user);
+
+    const response = await axios.put(`http://localhost:4000/api/auth/update-profile`, user, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    alert("Bilgileriniz güncellendi!");
+    localStorage.setItem("user", JSON.stringify(response.data.user)); // Backend'den dönen güncel veriyi kaydet
+  } catch (err) {
+    // Hatayı detaylı görmek için 
+    console.error("Hata Detayı:", err.response?.data || err.message);
+    alert("Güncelleme hatası: " + (err.response?.data?.message || "Sunucuya ulaşılamadı"));
+  }
+};
   // Çalışma süresini hesaplayan fonksiyon
-  const calculateWorkDuration = (startDate) => {
-    if (!startDate) return "Yeni Başladı";
-    const start = new Date(startDate);
+  const calculateWorkDuration = (date) => {
+    if (!date) return "Başlama tarihi seçilmedi";
+    const start = new Date(date);
     const now = new Date();
+    
+    // Eğer seçilen tarih gelecekse hata vermemesi için kontrol
+    if (start > now) return "Gelecek tarih seçilemez";
+
     const diffTime = Math.abs(now - start);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays < 30) return `${diffDays} gündür çalışıyor`;
+    
     const months = Math.floor(diffDays / 30);
+    const years = Math.floor(months / 12);
+    
+    if (years > 0) {
+      return `${years} yıl, ${months % 12} aydır çalışıyor`;
+    }
     return `${months} aydır çalışıyor`;
   };
 
@@ -73,7 +112,7 @@ const Profile = () => {
             <h3>{user.trainId || "Atama Bekliyor"}</h3>
           </div>
         )}
-      </div> {/* <-- BU DIV EKSİKTİ, KAPATILMALI */}
+      </div> 
 
       <form onSubmit={handleUpdate} className="profile-grid">
         <div className="profile-field">
@@ -83,12 +122,46 @@ const Profile = () => {
 
         <div className="profile-field">
           <label>T.C. Kimlik No</label>
-          <input type="text" maxLength="11" value={user.tcNo} onChange={e => setUser({...user, tcNo: e.target.value})} />
+          <input 
+            type="text" value={user.tcNo}
+            disabled 
+            
+          />
         </div>
 
         <div className="profile-field">
           <label>E-posta</label>
           <input type="email" value={user.email} disabled /> {/* Email genellikle değiştirilmez, disabled yaptık */}
+        </div>
+
+        {/* Telefon Numarası Alanı */}
+        <div className="profile-field">
+          <label>Telefon Numarası</label>
+          <input 
+            type="tel" 
+            placeholder="05xx xxx xx xx" 
+            value={user.phone} 
+            onChange={e => setUser({...user, phone: e.target.value})} 
+          />
+        </div>
+
+          {/* İşe Başlama Tarihi Seçici */}
+        <div className="profile-field">
+          <label>İşe Başlama Tarihi</label>
+          <input 
+            type="date" 
+            value={user.startDate ? user.startDate.split('T')[0] : ""} 
+            onChange={e => setUser({...user, startDate: e.target.value})} 
+            className="dark-date-picker" 
+            style={{
+              background: '#0f172a', 
+              color: '#fff', 
+              border: '1px solid #334155', 
+              borderRadius: '8px', 
+              padding: '10px',
+              colorScheme: 'dark' // Takvim kutusunun siyah temada düzgün görünmesini sağlar
+            }}
+          />
         </div>
 
         <div className="profile-field">

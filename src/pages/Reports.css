@@ -1,0 +1,214 @@
+/* GENEL KONTEYNER */
+.reports-container {
+  max-width: 1000px; /* Profil sayfasından biraz daha geniş tutalım tablolar için */
+  margin: 40px auto;
+  color: #fff;
+  padding: 0 20px;
+  min-height: 100%; /* İçerik arttıkça uzasın */
+  overflow: visible; /* İçeriğin taşmasına izin ver ki scroll çıksın */
+}
+
+/* ADMIN ÖZET KUTUCUKLARI (WIDGETS) */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: #1e293b; /* Profil sayfanla aynı arka plan */
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  text-align: center;
+}
+
+.stat-card h4 {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.stat-card p {
+  font-size: 28px;
+  font-weight: bold;
+  color: #38bdf8; /* Temanın canlı mavisi */
+}
+
+/* HEADER VE EKLEME BUTONU */
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.btn-add {
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-add:hover {
+  background: #7dd3fc;
+  transform: translateY(-2px);
+}
+
+/* ARIZA FORMU */
+.fault-form {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  border: 1px solid #38bdf8;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fault-form input, .fault-form textarea, .fault-form select ,.engineer-actions textarea {
+  width: 100%;             /* Genişlik tam olsun */
+  box-sizing: border-box;  /* TAŞMAYI ÖNLEYEN KRİTİK SATIR */
+  padding: 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #fff;
+
+  font-family: inherit;
+  display: block;          /* Alt alta düzgün dizilmeleri için */
+  margin-bottom: 10px;
+}
+
+/* ARIZA KARTLARI LİSTESİ */
+.fault-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fault-card {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #334155;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Ciddiyet Seviyesine Göre Renkli Kenarlık */
+.fault-card.Kritik { border-left: 5px solid #ef4444; }
+.fault-card.Orta { border-left: 5px solid #fbbf24; }
+.fault-card.Düşük { border-left: 5px solid #10b981; }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.status-badge.Açık { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.status-badge.Çözüldü { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+
+.fault-date {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.fault-desc {
+  color: #cbd5e1;
+  font-size: 14px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+/* MÜHENDİS VE ADMIN DETAY ALANLARI */
+.reporter-info, .admin-log {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #334155;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.reporter-info b, .admin-log b { color: #38bdf8; }
+
+.engineer-actions {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-resolve {
+  background: transparent;
+  color: #10b981;
+  border: 1px solid #10b981;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.btn-resolve:hover {
+  background: #10b981;
+  color: #fff;
+}
+.btn-save {
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+.makinist-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: flex-end;
+}
+
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: 0.3s;
+}
+
+.btn-edit {
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.btn-delete {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.btn-edit:hover { background: #38bdf8; color: #0f172a; }
+.btn-delete:hover { background: #ef4444; color: #fff; }
+

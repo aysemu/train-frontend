@@ -36,3 +36,24 @@
   border-radius: 10px;
   margin-bottom: 20px;
 }
+input[type="date"] {
+  background: #0f172a;
+  color: #fff;
+  border: 1px solid #334155;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  color-scheme: dark; /* Takvim ikonunun ve seçicinin karanlık modda düzgün görünmesini sağlar */
+}
+/* App.css veya index.css içine ekle */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  /* hidden yerine scroll'a izin ver */
+  overflow-x: hidden; /* Yatay kaydırmayı engelle (istenmeyen bir durumdur) */
+  overflow-y: auto;   /* İçerik sığmazsa dikey kaydırma çubuğunu otomatik çıkar */
+  height: auto;       /* Sabit 100% yerine içeriğe göre büyümesini sağla */
+  min-height: 100vh;  /* Ama en az ekran kadar olsun */
+  background-color: #0f172a; /* Senin ana koyu rengin */
+}

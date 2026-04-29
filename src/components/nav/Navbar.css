@@ -60,4 +60,23 @@
   border-radius: 8px;
   color: #fff;
 }
+.logout-btn-small {
+  background: transparent;
+  color: #94a3b8; /* Slate gray (temadaki yazı rengine yakın) */
+  border: 1px solid #334155;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
 
+.logout-btn-small:hover {
+  background: #334155;
+  color: #38bdf8; /* Temanın canlı mavisi */
+  border-color: #38bdf8;
+}
+.reports-container, .profile-container {
+  margin-top: 80px; /* Navbar 60px ise biraz daha fazlasını vererek nefes aldır */
+  padding-bottom: 50px; /* En alttaki kartların rahat görünmesi için alt boşluk */
+}

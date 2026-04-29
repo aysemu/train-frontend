@@ -10,7 +10,7 @@ const Navbar = ({ handleLogout }) => {
   return (
     <nav className="navbar">
       <div className="nav-logo" style={{color: '#38bdf8', fontWeight: 'bold'}}>
-        E5000 TELEMETRİ
+          TREN TELEMETRİ
       </div>
       <div className="nav-links">
         <Link to="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>Harita</Link>

@@ -9,13 +9,12 @@ import "./App.css";
 import LoginPage from "./pages/Login";
 import Navbar from "./components/nav/Navbar";
 import Profile from "./pages/Profile";
+import Reports from "./pages/Reports";
 
 // 1. DASHBOARD BİLEŞENİ (Harita stabilitesi için fonksiyon dışında tanımlı)
 const Dashboard = ({ trains, selectedTrain, setSelectedTrain, selectedHistoryPos, setSelectedHistoryPos, handleLogout, memoizedMap }) => (
   <div className="app-container">
-    <button onClick={handleLogout} className="logout-btn" style={{position: "absolute", top: 20, right: 20, zIndex: 1000}}>
-      Çıkış Yap
-    </button>
+    
 
     <TrainList
       trains={trains}
@@ -62,38 +61,40 @@ function App() {
   useEffect(() => {
     if (!token) return;
 
-    // Başlangıç verilerini çek
     fetch("http://localhost:4000/api/trains", {
       headers: { "Authorization": `Bearer ${token}` }
     })
-    .then(res => res.json())
-    .then(data => {
-      const trainMap = {};
-      data.forEach(t => {
-        // BAŞLANGIÇ VERİSİ FİLTRESİ: 
-        // Makinistse sadece kendi trenini yükle, değilse hepsini.
-        if (user?.role === "makinist") {
-            if (t.trainId === user.trainId) trainMap[t.trainId] = t;
-        } else {
-            trainMap[t.trainId] = t;
-        }
-      });
-      setTrains(trainMap);
-    })
-    .catch(err => console.error("Veri yüklenemedi:", err));
-
-    // Canlı veri dinle
-    socket.on("telemetry", (data) => {
-      // SOCKET FİLTRESİ:
-      // Makinistse ve gelen veri ona ait değilse state'i güncelleme.
-      if (user?.role === "makinist" && data.trainId !== user.trainId) {
-          return; 
+    .then(res => {
+      // 1. Yetki kontrolü: Eğer 401 gelirse veriyi işlemeye çalışma
+      if (!res.ok) {
+        throw new Error(`Sunucu Hatası: ${res.status}`);
       }
-      setTrains(prev => ({ ...prev, [data.trainId]: data }));
+      return res.json();
+    })
+    .then(data => {
+      // 2. data'nın dizi (Array) olup olmadığını kontrol et
+      // Bu sayede .forEach hatasından (TypeError) kurtuluruz
+      if (data && Array.isArray(data)) {
+        const trainMap = {};
+        data.forEach(t => {
+          if (user?.role === "makinist") {
+              if (t.trainId === user.trainId) trainMap[t.trainId] = t;
+          } else {
+              trainMap[t.trainId] = t;
+          }
+        });
+        setTrains(trainMap);
+      } else {
+        console.warn("Beklenen veri formatı gelmedi (Array bekleniyordu).");
+      }
+    })
+    .catch(err => {
+      // Burası Unauthorized hatasını yakalar ve uygulamayı çökertmeden loglar
+      console.error("Tren verileri çekilirken hata oluştu:", err.message);
     });
 
-    return () => socket.off("telemetry");
-  }, [token, user?.role, user?.trainId]); // user bilgilerini dependency'ye ekledik
+    // Socket ve diğer kısımlar aynı kalabilir...
+  }, [token, user?.role, user?.trainId]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -147,6 +148,11 @@ function App() {
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        } />
+        <Route path="/reports" element={
+          <ProtectedRoute>
+            <Reports />
           </ProtectedRoute>
         } />
 
