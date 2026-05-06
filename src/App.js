@@ -10,6 +10,7 @@ import LoginPage from "./pages/Login";
 import Navbar from "./components/nav/Navbar";
 import Profile from "./pages/Profile";
 import Reports from "./pages/Reports";
+import Maintenance from "./pages/Maintenance";
 
 // 1. DASHBOARD BİLEŞENİ (Harita stabilitesi için fonksiyon dışında tanımlı)
 const Dashboard = ({ trains, selectedTrain, setSelectedTrain, selectedHistoryPos, setSelectedHistoryPos, handleLogout, memoizedMap }) => (
@@ -59,42 +60,56 @@ function App() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (!token) return;
+  if (!token) return;
 
-    fetch("http://localhost:4000/api/trains", {
-      headers: { "Authorization": `Bearer ${token}` }
-    })
-    .then(res => {
-      // 1. Yetki kontrolü: Eğer 401 gelirse veriyi işlemeye çalışma
-      if (!res.ok) {
-        throw new Error(`Sunucu Hatası: ${res.status}`);
+  // --- A. İLK VERİLERİ ÇEK (REST API) ---
+  fetch("http://localhost:4000/api/trains", {
+    headers: { "Authorization": `Bearer ${token}` }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`Sunucu Hatası: ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    if (data && Array.isArray(data)) {
+      const trainMap = {};
+      data.forEach(t => {
+        if (user?.role === "makinist") {
+          if (t.trainId === user.trainId) trainMap[t.trainId] = t;
+        } else {
+          trainMap[t.trainId] = t;
+        }
+      });
+      setTrains(trainMap);
+    }
+  })
+  .catch(err => console.error("İlk yükleme hatası:", err));
+
+  // --- B. CANLI VERİLERİ DİNLE (SOCKET.IO) ---
+  // Backend'den 'telemetry_data' (veya senin belirlediğin isim) kanalını dinle
+  socket.on("telemetry_data", (newTrainData) => {
+    setTrains((prevTrains) => {
+      // Eğer kullanıcı makinistse sadece kendi trenini güncelle
+      if (user?.role === "makinist" && newTrainData.trainId !== user.trainId) {
+        return prevTrains;
       }
-      return res.json();
-    })
-    .then(data => {
-      // 2. data'nın dizi (Array) olup olmadığını kontrol et
-      // Bu sayede .forEach hatasından (TypeError) kurtuluruz
-      if (data && Array.isArray(data)) {
-        const trainMap = {};
-        data.forEach(t => {
-          if (user?.role === "makinist") {
-              if (t.trainId === user.trainId) trainMap[t.trainId] = t;
-          } else {
-              trainMap[t.trainId] = t;
-          }
-        });
-        setTrains(trainMap);
-      } else {
-        console.warn("Beklenen veri formatı gelmedi (Array bekleniyordu).");
-      }
-    })
-    .catch(err => {
-      // Burası Unauthorized hatasını yakalar ve uygulamayı çökertmeden loglar
-      console.error("Tren verileri çekilirken hata oluştu:", err.message);
+
+      // Mevcut trenlerin üzerine yeni gelen veriyi yaz (Anlık hareket sağlar)
+      return {
+        ...prevTrains,
+        [newTrainData.trainId]: {
+          ...prevTrains[newTrainData.trainId], // Eski verileri koru (isim vb.)
+          ...newTrainData // Yeni koordinat, hız ve sıcaklığı üzerine yaz
+        }
+      };
     });
+  });
 
-    // Socket ve diğer kısımlar aynı kalabilir...
-  }, [token, user?.role, user?.trainId]);
+  // Bileşen kapandığında dinlemeyi durdur (Memory leak önlemek için)
+  return () => {
+    socket.off("telemetry_data");
+  };
+}, [token, user?.role, user?.trainId]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -153,6 +168,11 @@ function App() {
         <Route path="/reports" element={
           <ProtectedRoute>
             <Reports />
+          </ProtectedRoute>
+        } />
+        <Route path="/maintenance" element={
+          <ProtectedRoute>
+            <Maintenance />
           </ProtectedRoute>
         } />
 

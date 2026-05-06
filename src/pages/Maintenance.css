@@ -1,0 +1,296 @@
+.maintenance-container {
+  padding: 40px;
+  color: white;
+  min-height: 100vh;
+  background-color: #0f172a; /* Genel tema rengi */
+}
+
+.page-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid #334155;
+  padding-bottom: 20px;
+}
+
+.maintenance-content {
+  display: grid;
+  /* Sayfayı iki ana sütuna bölüyoruz: Form için 400px, Liste için geri kalan alan */
+  grid-template-columns: 400px 1fr; 
+  gap: 50px;
+  align-items: start;
+}
+
+/* Form Bölümü */
+.plan-section {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.plan-section h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 1.25rem;
+}
+
+/* Form Elemanları */
+.field-group {
+  margin-bottom: 20px;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Input stillerini Login/Profil ile eşitleyelim */
+.auth-input, .auth-input-select {
+  width: 100%;
+  padding: 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: white;
+  font-size: 1rem;
+  box-sizing: border-box; /* Padding'in genişliği bozmasını engeller */
+}
+
+/* Bakım Takvimi Liste Bölümü */
+.list-section h3 {
+  margin-bottom: 25px;
+  font-size: 1.25rem;
+}
+
+.maintenance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Kart Tasarımı */
+.m-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative; /* İçindeki absolute öğeler için referans noktası */
+  padding-top: 40px; /* Üstteki butonlara yer açmak için içeriği biraz aşağı itiyoruz */
+}
+
+.m-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.m-badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #1d4ed8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+/* Mobil Uyumluluk */
+@media (max-width: 1024px) {
+  .maintenance-content {
+    grid-template-columns: 1fr;
+  }
+  .plan-section {
+    max-width: 100%;
+  }
+}
+
+.m-actions {
+  position: absolute; /* Serbest yerleşim */
+  top: 15px; /* Üstten boşluk */
+  right: 15px; /* Sağdan boşluk */
+  display: flex;
+  gap: 8px;
+  z-index: 10; /* Diğer öğelerin üzerinde durması için */
+}
+
+.btn-complete {
+  background: #10b981; /* Yeşil */
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-delete {
+  background: #ef4444; /* Kırmızı */
+  border: none;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+.m-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+.m-status.tamamlandı {
+  background: rgba(16, 185, 129, 0.2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.completion-form {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #334155;
+  animation: fadeIn 0.3s ease;
+}
+
+.completion-textarea {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  color: white;
+  padding: 10px;
+  font-size: 13px;
+  resize: none;
+  min-height: 80px;
+  margin-bottom: 10px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-save {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #475569;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.m-completed-note {
+  font-size: 13px;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  padding: 8px;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.btn-edit {
+  background: #f59e0b; /* Turuncu tonu */
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: background 0.3s;
+}
+
+.btn-edit:hover {
+  background: #d97706;
+}
+
+.edit-form-inline {
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(245, 158, 11, 0.05);
+  border: 1px dashed #f59e0b;
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.comment-section {
+  margin-top: 20px;
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.comment-list {
+  max-height: 150px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-bubble {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #334155;
+  border-left: 3px solid #64b5f6;
+}
+/* Saat stili */
+.comment-date {
+  display: block;
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap; /* Saatin alt satıra kaymasını engeller */
+  margin-right: auto; /* Flex içinde en sağa itilmesi için ekstra garanti */
+}
+
+/* Mühendis yorumları farklı renk görünsün */
+.comment-bubble.engineer { border-left-color: #f59e0b; }
+.comment-bubble.makinist { border-left-color: #10b981; }
+
+.comment-input-group {
+  display: flex;
+  gap: 5px;
+}
+
+.comment-input-group input {
+  flex: 1;
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.comment-input-group button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}

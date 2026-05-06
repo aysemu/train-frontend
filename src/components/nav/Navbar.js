@@ -16,6 +16,7 @@ const Navbar = ({ handleLogout }) => {
         <Link to="/" className={`nav-item ${location.pathname === '/' ? 'active' : ''}`}>Harita</Link>
         <Link to="/profile" className={`nav-item ${location.pathname === '/profile' ? 'active' : ''}`}>Profil</Link>
         <Link to="/reports" className="nav-item">Raporlar</Link>
+        <Link to="/maintenance" className="nav-item">Bakım Takvimi</Link>
       </div>
       <button onClick={handleLogout} className="logout-btn-small">Çıkış</button>
     </nav>
