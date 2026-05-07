@@ -123,13 +123,15 @@ const handleCommentSubmit = async (id) => {
       <p>Lokomotiflerin periyodik kontrol süreçlerini buradan yönetebilirsiniz.</p>
     </header>
 
-    <div className="maintenance-content">
-      {/* SADECE MÜHENDİS VE ADMİN FORM GÖREBİLİR */}
+    {/* İçerik yapısını dikey bir akışa çevirdik */}
+    <div className="maintenance-content" style={{ flexDirection: 'column', gap: '40px' }}>
+      
+      {/* 1. ÜST KISIM: YENİ PLANLAMA FORMU (Sadece yetkililer görür) */}
       {(user.role === "admin" || user.role === "engineer") && (
-        <section className="plan-section">
-          <div className="auth-form" style={{ maxWidth: "400px" }}>
-            <h3 style={{ color: "#64b5f6", marginBottom: "15px" }}>Yeni Bakım Planla</h3>
-            <form onSubmit={handleSubmit}>
+        <section className="plan-section" style={{ width: '100%', maxWidth: 'none' }}>
+          <div className="auth-form" style={{ maxWidth: "600px", margin: "0 auto" }}>
+            <h3 style={{ color: "#64b5f6", marginBottom: "15px", textAlign: 'center' }}>Yeni Bakım Planla</h3>
+            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
               <div className="field-group">
                 <label className="field-label">Lokomotif (E5000 Serisi)</label>
                 <select 
@@ -145,15 +147,6 @@ const handleCommentSubmit = async (id) => {
               </div>
 
               <div className="field-group">
-                <label className="field-label">Bakım Başlığı</label>
-                <input 
-                  type="text" className="auth-input" placeholder="Örn: Yıllık Fren Bakımı"
-                  required value={formData.title}
-                  onChange={e => setFormData({...formData, title: e.target.value})}
-                />
-              </div>
-
-              <div className="field-group">
                 <label className="field-label">Planlanan Tarih</label>
                 <input 
                   type="date" className="auth-input" required 
@@ -163,7 +156,16 @@ const handleCommentSubmit = async (id) => {
                 />
               </div>
 
-              <button type="submit" className="btn-primary" style={{ marginTop: "15px" }}>
+              <div className="field-group" style={{ gridColumn: 'span 2' }}>
+                <label className="field-label">Bakım Başlığı</label>
+                <input 
+                  type="text" className="auth-input" placeholder="Örn: Yıllık Fren Bakımı"
+                  required value={formData.title}
+                  onChange={e => setFormData({...formData, title: e.target.value})}
+                />
+              </div>
+
+              <button type="submit" className="btn-primary" style={{ gridColumn: 'span 2', marginTop: "10px" }}>
                 SİSTEME KAYDET
               </button>
             </form>
@@ -171,53 +173,50 @@ const handleCommentSubmit = async (id) => {
         </section>
       )}
 
-      {/* LİSTE HERKESE GÖRÜNÜR */}
-      <section className="list-section">
-        <h3 style={{ color: "#64b5f6", marginBottom: "15px" }}>Bakım Takvimi</h3>
-        <div className="maintenance-grid">
+      {/* 2. ALT KISIM: BAKIM TAKVİMİ LİSTESİ */}
+      <section className="list-section" style={{ width: '100%' }}>
+        <h3 style={{ color: "#64b5f6", marginBottom: "20px", borderBottom: '1px solid #334155', paddingBottom: '10px' }}>
+          📅 Bakım Takvimi
+        </h3>
+        
+        {/* Grid yapısını 1 sütun (yatay satır) yaptık */}
+        <div className="maintenance-grid" style={{ gridTemplateColumns: '1fr' }}>
           {maintenances
-            // --- FİLTRELEME BURADA BAŞLIYOR ---
             .filter(m => {
               if (user?.role === "makinist") {
-                return m.trainId === user.trainId; // Makinistse sadece kendi trenini görsün
+                return m.trainId === user.trainId;
               }
-              return true; // Admin/Engineer ise her şeyi görsün
+              return true;
             })
-            // ---------------------------------
             .map(m => (
               <div key={m._id} className={`m-card ${m.status === 'Beklemede' && new Date(m.plannedDate) < new Date() ? 'expired' : ''}`}>
                 <div className="m-badge">{m.trainId}</div>
+                
+                {/* Aksiyon butonlarını sağ üste taşıyoruz (CSS desteğiyle) */}
+                <div className="m-actions">
+                  {(user.role === "admin" || user.role === "engineer") && editingId !== m._id && (
+                    <button onClick={() => handleEditClick(m)} className="btn-edit">
+                      {m.status === "Tamamlandı" ? "Tekrar Aç" : "Düzenle"}
+                    </button>
+                  )}
+                  {m.status === "Beklemede" && completingId !== m._id && editingId !== m._id && (
+                    <button onClick={() => setCompletingId(m._id)} className="btn-complete">Kapat</button>
+                  )}
+                  {(user.role === "admin" || user.role === "engineer") && editingId !== m._id && completingId !== m._id && (
+                    <button onClick={() => handleDelete(m._id)} className="btn-delete">Sil</button>
+                  )}
+                </div>
+
                 <h4>{m.title}</h4>
                 <p>📅 {new Date(m.plannedDate).toLocaleDateString('tr-TR')}</p>
 
-                {/* Eğer bakım tamamlanmışsa notu göster */}
                 {m.status === "Tamamlandı" && m.description && (
                   <div className="m-completed-note">📝 Kapatma Notu: {m.description}</div>
                 )}
 
                 <div className={`m-status ${m.status.toLowerCase()}`}>{m.status}</div>
 
-                {/* AKSİYON ALANI */}
-                <div className="m-actions">
-                  {/* DÜZENLE BUTONU (Mühendis ve Admin her durumda görebilir) */}
-                  {(user.role === "admin" || user.role === "engineer") && editingId !== m._id && (
-                    <button onClick={() => handleEditClick(m)} className="btn-edit">
-                      {m.status === "Tamamlandı" ? "Düzenle / Tekrar Aç" : "Düzenle"}
-                    </button>
-                  )}
-
-                  {/* Bakımı Kapat Butonu (Sadece beklemedeki bakımlar için) */}
-                  {m.status === "Beklemede" && completingId !== m._id && editingId !== m._id && (
-                    <button onClick={() => setCompletingId(m._id)} className="btn-complete">Bakımı Kapat</button>
-                  )}
-
-                  {/* Sil Butonu (Sadece Admin ve Engineer için) */}
-                  {(user.role === "admin" || user.role === "engineer") && editingId !== m._id && completingId !== m._id && (
-                    <button onClick={() => handleDelete(m._id)} className="btn-delete">Sil</button>
-                  )}
-                </div>
-
-                {/* DÜZENLEME FORMU */}
+                {/* FORM ALANLARI */}
                 {editingId === m._id && (
                   <div className="edit-form-inline">
                     <label className="field-label">Başlığı Güncelle</label>
@@ -225,12 +224,11 @@ const handleCommentSubmit = async (id) => {
                       type="text" className="auth-input"
                       value={editData.title}
                       onChange={(e) => setEditData({...editData, title: e.target.value})}
-                      style={{ marginBottom: '10px' }}
                     />
                     <label className="field-label">Tarihi Güncelle</label>
                     <input 
                       type="date" className="auth-input"
-                      style={{ colorScheme: 'dark', marginBottom: '10px' }}
+                      style={{ colorScheme: 'dark' }}
                       value={editData.plannedDate}
                       onChange={(e) => setEditData({...editData, plannedDate: e.target.value})}
                     />
@@ -241,11 +239,10 @@ const handleCommentSubmit = async (id) => {
                   </div>
                 )}
 
-                {/* AÇIKLAMA (KAPATMA) FORMU */}
                 {completingId === m._id && (
                   <div className="completion-form">
                     <textarea 
-                      placeholder="Yapılan işlemler hakkında kısa bilgi verin..."
+                      placeholder="Yapılan işlemler hakkında bilgi verin..."
                       value={completionDesc}
                       onChange={(e) => setCompletionDesc(e.target.value)}
                       className="completion-textarea"
@@ -257,14 +254,16 @@ const handleCommentSubmit = async (id) => {
                   </div>
                 )}
 
-                {/* YORUM / SOHBET ALANI */}
+                {/* SOHBET ALANI */}
                 <div className="comment-section">
                   <h5 className="comment-title">💬 İletişim & Notlar</h5>
                   <div className="comment-list">
                     {m.comments?.length > 0 ? (
                       m.comments.map((c, index) => (
                         <div key={index} className={`comment-bubble ${c.role}`}>
-                          <strong>{c.user} ({c.role}):</strong> {c.text}
+                          <span className="comment-text-wrapper">
+                            <strong>{c.user} ({c.role}):</strong> {c.text}
+                          </span>
                           <span className="comment-date">{new Date(c.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                         </div>
                       ))
@@ -272,11 +271,10 @@ const handleCommentSubmit = async (id) => {
                       <p style={{fontSize: '11px', color: '#64748b', textAlign: 'center'}}>Henüz yorum yapılmamış.</p>
                     )}
                   </div>
-                  
                   <div className="comment-input-group">
                     <input 
                       type="text" 
-                      placeholder="Bir mesaj yazın..." 
+                      placeholder="Mesaj yazın..." 
                       value={commentText}
                       onChange={(e) => setCommentText(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(m._id)}
@@ -284,15 +282,13 @@ const handleCommentSubmit = async (id) => {
                     <button onClick={() => handleCommentSubmit(m._id)}>Gönder</button>
                   </div>
                 </div>
-
               </div>
             ))
           }
 
-          {/* Makinistin hiç bakımı yoksa kullanıcıya bilgi verelim */}
           {user?.role === "makinist" && 
           maintenances.filter(m => m.trainId === user.trainId).length === 0 && (
-            <p style={{ color: "#94a3b8", gridColumn: "1/-1", textAlign: "center", marginTop: "20px" }}>
+            <p style={{ color: "#94a3b8", textAlign: "center", marginTop: "20px" }}>
               Treninize ait planlanmış bir bakım bulunmamaktadır.
             </p>
           )}
